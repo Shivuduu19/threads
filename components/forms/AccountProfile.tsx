@@ -19,6 +19,8 @@ import { ChangeEvent, useState } from "react";
 import { Textarea } from "../ui/textarea";
 import { isBase64Image } from "@/lib/utils";
 import { useUploadThing } from "@/lib/uploadthing";
+import { updateUser } from "@/lib/actions/user.actions";
+import { usePathname, useRouter } from "next/navigation";
 
 interface Props {
     user: {
@@ -33,7 +35,19 @@ interface Props {
 }
 const AccountProfile = ({ user, btnTitle }: Props) => {
     const [files, setFiles] = useState<File[]>([])
-    const { startUpload } = useUploadThing("media")
+    const { startUpload } = useUploadThing(
+        "media",
+        {
+            onClientUploadComplete: () => {
+                alert("uploaded successfully!");
+            },
+            onUploadError: () => {
+                alert("error occurred while uploading");
+            }
+        },
+    );
+    const router = useRouter()
+    const pathname = usePathname()
 
     const form = useForm({
         resolver: zodResolver(UserValidation),
@@ -68,11 +82,32 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
     const onSubmit = async (values: z.infer<typeof UserValidation>) => {
         const blob = values.profile_photo
         const hasImageChanged = isBase64Image(blob)
+        console.log(hasImageChanged);
+
         if (hasImageChanged) {
             const imgRes = await startUpload(files)
+            console.log(imgRes);
+
+            console.log(startUpload);
+
             if (imgRes && imgRes[0].url) {
                 values.profile_photo = imgRes[0].url
+
             }
+        }
+        await updateUser({
+            username: values.username,
+            name: values.name,
+            bio: values.bio,
+            image: values.profile_photo,
+            userId: user.id,
+            path: pathname
+        }
+        )
+        if (pathname === '/profile/edit') {
+            router.back();
+        } else {
+            router.push('/')
         }
     }
     return (
@@ -162,13 +197,14 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
                     render={({ field }) => (
                         <FormItem className="flex w-full flex-col gap-3">
                             <FormLabel className="text-base-semibold text-light-2">
-                                BIo
+                                Bio
                             </FormLabel>
                             <FormControl className="flex-1 text-base-semibold text-gray-200"
                             >
                                 <Textarea
                                     rows={10}
                                     className="account-form_input no-focus"
+                                    {...field}
                                 />
                             </FormControl>
                             <FormMessage />
@@ -180,5 +216,6 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
         </Form>
     )
 }
+
 
 export default AccountProfile
