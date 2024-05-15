@@ -3,6 +3,7 @@ import { currentUser } from "@clerk/nextjs/server";
 async function Page() {
 
     const user = await currentUser()
+    // console.log("shiva");
 
     const userInfo = {};
 
