@@ -5,7 +5,7 @@ import { redirect } from "next/navigation"
 async function Page() {
     const user = await currentUser()
     console.log(user);
-    console.log("shiva");
+    // console.log("shiva");
 
 
     if (!user) return null
