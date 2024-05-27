@@ -8,7 +8,7 @@ import Image from "next/image"
 import { redirect } from "next/navigation"
 import ThreadsTab from "@/components/shared/ThreadsTab"
 
-const page = async () => {
+const Page = async () => {
     const user = await currentUser()
     // console.log(user);
 
