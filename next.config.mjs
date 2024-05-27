@@ -21,8 +21,10 @@ export const images = {
             hostname: "utfs.io",
         },
     ],
-    typescript: {
-        ignoreBuildErrors: true,
-    },
+    // typescript: {
+    // },
 };
+export const typescript = {
+    ignoreBuildErrors: true,
+}
 
